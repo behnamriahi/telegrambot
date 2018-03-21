@@ -55,17 +55,17 @@ end
 function run(msg, matches)
   if (matches[1] == "ing") then
     if (matches [2] == "reset") then
-      clear_votes (tostring(msg.to.id))
+      clear_votes (tostring(msg.to.peer_id))
       return "Voting statistics reset.."
     elseif (matches [2] == "stats") then
-      local votes_result = votes_result (tostring(msg.to.id))
+      local votes_result = votes_result (tostring(msg.to.peer_id))
       if (votes_result == "") then
         votes_result = "[No votes registered]\n"
       end
       return "Voting statistics :\n" .. votes_result
     end
   else
-    save_vote(tostring(msg.to.id), msg.from.print_name, tostring(tonumber(matches[2])))
+    save_vote(tostring(msg.to.peer_id), msg.from.print_name, tostring(tonumber(matches[2])))
     return "Vote registered : " .. msg.from.print_name .. " " .. tostring(tonumber(matches [2]))
   end
 end

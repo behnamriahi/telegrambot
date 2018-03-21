@@ -63,7 +63,7 @@ end
 
 
 local function run(msg, matches)
-  local chat_id = tostring(msg.to.id)
+  local chat_id = tostring(msg.to.peer_id)
 	local result = parseText(chat_id, msg.text)
 	return result
 end

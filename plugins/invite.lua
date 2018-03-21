@@ -23,8 +23,8 @@ local function run(msg, matches)
   end
 
   -- The message must come from a chat group
-  if msg.to.type == 'chat' then
-    local chat = 'chat#id'..msg.to.id
+  if msg.to.peer_type == 'chat' then
+    local chat = 'chat#id'..msg.to.peer_id
     chat_add_user(chat, user, callback, false)
     return "Add: "..user.." to "..chat
   else 

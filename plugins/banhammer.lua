@@ -49,15 +49,15 @@ local function pre_process(msg)
     if action == 'chat_add_user' or action == 'chat_add_user_link' then
       local user_id
       if msg.action.link_issuer then
-        user_id = msg.from.id
+        user_id = msg.from.peer_id
       else
 	      user_id = msg.action.user.id
       end
       print('Checking invited user '..user_id)
-      local banned = is_banned(user_id, msg.to.id)
+      local banned = is_banned(user_id, msg.to.peer_id)
       if banned then
         print('User is banned!')
-        kick_user(user_id, msg.to.id)
+        kick_user(user_id, msg.to.peer_id)
       end
     end
     -- No further checks
@@ -65,9 +65,9 @@ local function pre_process(msg)
   end
 
   -- BANNED USER TALKING
-  if msg.to.type == 'chat' then
-    local user_id = msg.from.id
-    local chat_id = msg.to.id
+  if msg.to.peer_type == 'chat' then
+    local user_id = msg.from.peer_id
+    local chat_id = msg.to.peer_id
     local banned = is_banned(user_id, chat_id)
     if banned then
       print('Banned user talking!')
@@ -85,20 +85,20 @@ local function pre_process(msg)
   if whitelist and not issudo then
     print('Whitelist enabled and not sudo')
     -- Check if user or chat is whitelisted
-    local allowed = is_user_whitelisted(msg.from.id)
+    local allowed = is_user_whitelisted(msg.from.peer_id)
 
     if not allowed then
-      print('User '..msg.from.id..' not whitelisted')
-      if msg.to.type == 'chat' then
-        allowed = is_chat_whitelisted(msg.to.id)
+      print('User '..msg.from.peer_id..' not whitelisted')
+      if msg.to.peer_type == 'chat' then
+        allowed = is_chat_whitelisted(msg.to.peer_id)
         if not allowed then
-          print ('Chat '..msg.to.id..' not whitelisted')
+          print ('Chat '..msg.to.peer_id..' not whitelisted')
         else
-          print ('Chat '..msg.to.id..' whitelisted :)')
+          print ('Chat '..msg.to.peer_id..' whitelisted :)')
         end
       end
     else
-      print('User '..msg.from.id..' allowed :)')
+      print('User '..msg.from.peer_id..' allowed :)')
     end
 
     if not allowed then
@@ -121,9 +121,9 @@ local function run(msg, matches)
 
   if matches[1] == 'ban' then
     local user_id = matches[3]
-    local chat_id = msg.to.id
+    local chat_id = msg.to.peer_id
 
-    if msg.to.type == 'chat' then
+    if msg.to.peer_type == 'chat' then
       if matches[2] == 'user' then
         ban_user(user_id, chat_id)
         return 'User '..user_id..' banned'
@@ -139,8 +139,8 @@ local function run(msg, matches)
   end
 
   if matches[1] == 'kick' then
-    if msg.to.type == 'chat' then
-      kick_user(matches[2], msg.to.id)
+    if msg.to.peer_type == 'chat' then
+      kick_user(matches[2], msg.to.peer_id)
     else
       return 'This isn\'t a chat group'
     end
@@ -166,12 +166,12 @@ local function run(msg, matches)
     end
 
     if matches[2] == 'chat' then
-      if msg.to.type ~= 'chat' then
+      if msg.to.peer_type ~= 'chat' then
         return 'This isn\'t a chat group'
       end
-      local hash = 'whitelist:chat#id'..msg.to.id
+      local hash = 'whitelist:chat#id'..msg.to.peer_id
       redis:set(hash, true)
-      return 'Chat '..msg.to.id..' whitelisted'
+      return 'Chat '..msg.to.peer_id..' whitelisted'
     end
 
     if matches[2] == 'delete' and matches[3] == 'user' then
@@ -181,12 +181,12 @@ local function run(msg, matches)
     end
 
     if matches[2] == 'delete' and matches[3] == 'chat' then
-      if msg.to.type ~= 'chat' then
+      if msg.to.peer_type ~= 'chat' then
         return 'This isn\'t a chat group'
       end
-      local hash = 'whitelist:chat#id'..msg.to.id
+      local hash = 'whitelist:chat#id'..msg.to.peer_id
       redis:del(hash)
-      return 'Chat '..msg.to.id..' removed from whitelist'
+      return 'Chat '..msg.to.peer_id..' removed from whitelist'
     end
 
   end

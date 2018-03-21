@@ -12,19 +12,19 @@ redis = (loadfile "./libs/redis.lua")()
 http.TIMEOUT = 10
 
 function get_receiver(msg)
-  if msg.to.type == 'user' then
-    return 'user#id'..msg.from.id
+  if msg.to.peer_type == 'user' then
+    return 'user#id'..msg.from.peer_id
   end
-  if msg.to.type == 'chat' then
-    return 'chat#id'..msg.to.id
+  if msg.to.peer_type == 'chat' then
+    return 'chat#id'..msg.to.peer_id
   end
-  if msg.to.type == 'encr_chat' then
+  if msg.to.peer_type == 'encr_chat' then
     return msg.to.print_name
   end
 end
 
 function is_chat_msg( msg )
-  if msg.to.type == 'chat' then
+  if msg.to.peer_type == 'chat' then
     return true
   end
   return false
@@ -152,7 +152,7 @@ function is_sudo(msg)
   local var = false
   -- Check users id in config
   for v,user in pairs(_config.sudo_users) do
-    if user == msg.from.id then
+    if user == msg.from.peer_id then
       var = true
     end
   end
@@ -163,7 +163,7 @@ end
 function get_name(msg)
   local name = msg.from.first_name
   if name == nil then
-    name = msg.from.id
+    name = msg.from.peer_id
   end
   return name
 end

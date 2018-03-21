@@ -9,10 +9,10 @@ local function kick_user(user_id, chat_id)
 end
 
 local function run (msg, matches)
-  local user = msg.from.id
-  local chat = msg.to.id
+  local user = msg.from.peer_id
+  local chat = msg.to.peer_id
 
-  if msg.to.type ~= 'chat' then
+  if msg.to.peer_type ~= 'chat' then
     return "Not a chat group!"
   elseif user == tostring(our_id) then
     --[[ A robot must protect its own existence as long as such protection does

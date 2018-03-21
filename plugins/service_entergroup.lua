@@ -24,7 +24,7 @@ function chat_new_user_link(msg)
    local to_username = msg.from.username
    local from_username = '[link](@' .. (msg.action.link_issuer.username or '') .. ')'
    local chat_name = msg.to.print_name
-   local chat_id = msg.to.id
+   local chat_id = msg.to.peer_id
    pattern = template_add_user(pattern, to_username, from_username, chat_name, chat_id)
    if pattern ~= '' then
       local receiver = get_receiver(msg)
@@ -37,7 +37,7 @@ function chat_new_user(msg)
    local to_username = msg.action.user.username
    local from_username = msg.from.username
    local chat_name = msg.to.print_name
-   local chat_id = msg.to.id
+   local chat_id = msg.to.peer_id
    pattern = template_add_user(pattern, to_username, from_username, chat_name, chat_id)
    if pattern ~= '' then
       local receiver = get_receiver(msg)

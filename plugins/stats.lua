@@ -70,8 +70,8 @@ local function pre_process(msg)
   end
 
   -- Save user on Redis
-  if msg.from.type == 'user' then
-    local hash = 'user:'..msg.from.id
+  if msg.from.peer_type == 'user' then
+    local hash = 'user:'..msg.from.peer_id
     print('Saving user', hash)
     if msg.from.print_name then
       redis:hset(hash, 'print_name', msg.from.print_name)
@@ -85,22 +85,22 @@ local function pre_process(msg)
   end
 
   -- Save stats on Redis
-  if msg.to.type == 'chat' then
+  if msg.to.peer_type == 'chat' then
     -- User is on chat
-    local hash = 'chat:'..msg.to.id..':users'
-    redis:sadd(hash, msg.from.id)
+    local hash = 'chat:'..msg.to.peer_id..':users'
+    redis:sadd(hash, msg.from.peer_id)
   end
 
   -- Total user msgs
-  local hash = 'msgs:'..msg.from.id..':'..msg.to.id
+  local hash = 'msgs:'..msg.from.peer_id..':'..msg.to.peer_id
   redis:incr(hash)
 
   -- Check flood
-  if msg.from.type == 'user' then
-    local hash = 'user:'..msg.from.id..':msgs'
+  if msg.from.peer_type == 'user' then
+    local hash = 'user:'..msg.from.peer_id..':msgs'
     local msgs = tonumber(redis:get(hash) or 0)
     if msgs > NUM_MSG_MAX then
-      print('User '..msg.from.id..'is flooding '..msgs)
+      print('User '..msg.from.peer_id..'is flooding '..msgs)
       msg = nil
     end
     redis:setex(hash, TIME_CHECK, msgs+1)
@@ -139,8 +139,8 @@ local function run(msg, matches)
   if matches[1]:lower() == "stats" then
 
     if not matches[2] then
-      if msg.to.type == 'chat' then
-        local chat_id = msg.to.id
+      if msg.to.peer_type == 'chat' then
+        local chat_id = msg.to.peer_id
         return chat_stats(chat_id)
       else
         return 'Stats works only on chats'

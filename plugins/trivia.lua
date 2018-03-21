@@ -4,11 +4,11 @@ do
 -- Returns the chat hash for storing information
 local function get_hash(msg)
   local hash = nil
-  if msg.to.type == 'chat' then
-    hash = 'chat:'..msg.to.id..':trivia'
+  if msg.to.peer_type == 'chat' then
+    hash = 'chat:'..msg.to.peer_id..':trivia'
   end
-  if msg.to.type == 'user' then
-    hash = 'user:'..msg.from.id..':trivia'
+  if msg.to.peer_type == 'user' then
+    hash = 'user:'..msg.from.peer_id..':trivia'
   end
   return hash
 end
@@ -117,8 +117,8 @@ end
 local function give_point(msg)
   local hash = get_hash(msg)
   if hash then
-    local score = tonumber(redis:hget(hash, msg.from.id) or 0)
-    redis:hset(hash, msg.from.id, score+1)
+    local score = tonumber(redis:hget(hash, msg.from.peer_id) or 0)
+    redis:hset(hash, msg.from.peer_id, score+1)
   end
 end
 
@@ -162,7 +162,7 @@ local function get_user_score(msg, user_id, chat_id)
   local user_info = {}
   local uhash = 'user:'..user_id
   local user = redis:hgetall(uhash)
-  local hash = 'chat:'..msg.to.id..':trivia'
+  local hash = 'chat:'..msg.to.peer_id..':trivia'
   user_info.score = tonumber(redis:hget(hash, user_id) or 0)
   user_info.name = user_print_name(user)..' ('..user_id..')'
   return user_info
@@ -170,16 +170,16 @@ end
 
 -- Function to print score
 local function trivia_scores(msg)
-  if msg.to.type == 'chat' then
+  if msg.to.peer_type == 'chat' then
     -- Users on chat
-    local hash = 'chat:'..msg.to.id..':users'
+    local hash = 'chat:'..msg.to.peer_id..':users'
     local users = redis:smembers(hash)
     local users_info = {}
 
     -- Get user info
     for i = 1, #users do
       local user_id = users[i]
-      local user_info = get_user_score(msg, user_id, msg.to.id)
+      local user_info = get_user_score(msg, user_id, msg.to.peer_id)
       table.insert(users_info, user_info)
     end
 

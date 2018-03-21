@@ -15,7 +15,7 @@ function read_quotes_file()
 end
 
 function save_quote(msg)
-    local to_id = tostring(msg.to.id)
+    local to_id = tostring(msg.to.peer_id)
 
     if msg.text:sub(11):isempty() then
         return "Usage: !addquote quote"
@@ -39,7 +39,7 @@ function save_quote(msg)
 end
 
 function get_quote(msg)
-    local to_id = tostring(msg.to.id)
+    local to_id = tostring(msg.to.peer_id)
     local quotes_phrases
 
     quotes_table = read_quotes_file()

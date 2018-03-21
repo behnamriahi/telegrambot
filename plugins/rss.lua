@@ -149,10 +149,10 @@ local function cron()
 end
 
 local function run(msg, matches)
-   local id = "user#id" .. msg.from.id
+   local id = "user#id" .. msg.from.peer_id
 
    if is_chat_msg(msg) then
-      id = "chat#id" .. msg.to.id
+      id = "chat#id" .. msg.to.peer_id
    end
 
    if matches[1] == "!rss"then

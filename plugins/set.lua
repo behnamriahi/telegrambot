@@ -4,11 +4,11 @@ local function save_value(msg, name, value)
   end
   
   local hash = nil
-  if msg.to.type == 'chat' then
-    hash = 'chat:'..msg.to.id..':variables'
+  if msg.to.peer_type == 'chat' then
+    hash = 'chat:'..msg.to.peer_id..':variables'
   end
-  if msg.to.type == 'user' then
-    hash = 'user:'..msg.from.id..':variables'
+  if msg.to.peer_type == 'user' then
+    hash = 'user:'..msg.from.peer_id..':variables'
   end
   if hash then
     redis:hset(hash, name, value)

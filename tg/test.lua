@@ -79,7 +79,7 @@ function on_msg_receive (msg)
   do_notify (get_title (msg.from, msg.to), msg.text)
 
   if (msg.text == 'ping') then
-    if (msg.to.id == our_id) then
+    if (msg.to.peer_id == our_id) then
       send_msg (msg.from.print_name, 'pong', ok_cb, false)
     else
       send_msg (msg.to.print_name, 'pong', ok_cb, false)
@@ -87,7 +87,7 @@ function on_msg_receive (msg)
     return
   end
   if (msg.text == 'PING') then
-    if (msg.to.id == our_id) then
+    if (msg.to.peer_id == our_id) then
       fwd_msg (msg.from.print_name, msg.id, ok_cb, false)
     else
       fwd_msg (msg.to.print_name, msg.id, ok_cb, false)

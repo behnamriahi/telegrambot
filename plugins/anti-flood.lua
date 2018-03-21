@@ -13,10 +13,10 @@ local function kick_user(user_id, chat_id)
 end
 
 local function run (msg, matches)
-  if msg.to.type ~= 'chat' then
+  if msg.to.peer_type ~= 'chat' then
     return 'Anti-flood works only on channels'
   else
-    local chat = msg.to.id
+    local chat = msg.to.peer_id
     local hash = 'anti-flood:enabled:'..chat
     if matches[1] == 'enable' then
       redis:set(hash, true)
@@ -36,24 +36,24 @@ local function pre_process (msg)
     return msg
   end
 
-  local hash_enable = 'anti-flood:enabled:'..msg.to.id
+  local hash_enable = 'anti-flood:enabled:'..msg.to.peer_id
   local enabled = redis:get(hash_enable)
 
   if enabled then
     print('anti-flood enabled')
     -- Check flood
-    if msg.from.type == 'user' then
+    if msg.from.peer_type == 'user' then
       -- Increase the number of messages from the user on the chat
-      local hash = 'anti-flood:'..msg.from.id..':'..msg.to.id..':msg-num'
+      local hash = 'anti-flood:'..msg.from.peer_id..':'..msg.to.peer_id..':msg-num'
       local msgs = tonumber(redis:get(hash) or 0)
       if msgs > NUM_MSG_MAX then
         local receiver = get_receiver(msg)
-        local user = msg.from.id
+        local user = msg.from.peer_id
         local text = 'User '..user..' is flooding'
-        local chat = msg.to.id
+        local chat = msg.to.peer_id
 
         send_msg(receiver, text, ok_cb, nil)
-        if msg.to.type ~= 'chat' then
+        if msg.to.peer_type ~= 'chat' then
           print("Flood in not a chat group!")
         elseif user == tostring(our_id) then
           print('I won\'t kick myself')
@@ -62,7 +62,7 @@ local function pre_process (msg)
         else
           -- Ban user
           -- TODO: Check on this plugin bans
-          local bhash = 'banned:'..msg.to.id..':'..msg.from.id
+          local bhash = 'banned:'..msg.to.peer_id..':'..msg.from.peer_id
           redis:set(bhash, true)
           kick_user(user, chat)
         end
